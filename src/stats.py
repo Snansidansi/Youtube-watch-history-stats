@@ -1,5 +1,6 @@
 import json
 import datetime
+from matplotlib import pyplot as plt
 
 
 def get_data_from_file(filename):
@@ -64,6 +65,29 @@ def save_stats(data):
         for count, channel in enumerate(frequency_per_channel, 1):
             percentage = (channel[1] / total_videos(data))
             file.write(f"{count}. {channel[0]}: {channel[1]} ({percentage:.2%})\n")
+
+
+def create_diagram(data, threshold):
+    counter = dict(sort_videos_by_channel(threshold_videos_by_channel(videos_per_channel(data), threshold)))
+    x = list(counter.keys())
+    y = list(counter.values())
+    label_length = max([len(channel) for channel in counter])
+
+    fig_size = plt.gcf().get_size_inches()
+    plt.figure(figsize=(fig_size[0], fig_size[1] + label_length * 0.05))
+
+    plt.style.use("fast")
+
+    plt.title(f"Videos per channel (threshold: {threshold})")
+    plt.xlabel("Channel")
+    plt.ylabel("Videos")
+
+    plt.xticks(rotation=90)
+    plt.yticks(y)
+
+    plt.bar(x, y, width=0.75)
+    plt.tight_layout()
+    plt.show()
 
 
 def total_stats(filename):
