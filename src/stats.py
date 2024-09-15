@@ -22,6 +22,19 @@ def videos_per_channel(data):
     return counter
 
 
+def threshold_videos_by_channel(counter, threshold):
+    new_counter = dict()
+    for channel in counter:
+        if counter[channel] >= threshold:
+            new_counter[channel] = counter[channel]
+
+    return new_counter
+
+
+def sort_videos_by_channel(counter):
+    return sorted(counter.items(), key=lambda x:(-x[1], x[0]))
+
+
 def get_datetime(date):
     return datetime.datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%fZ")
 
@@ -38,7 +51,7 @@ def get_newest(data):
 
 def save_stats(data):
     current_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    frequency_per_channel = sorted(videos_per_channel(data).items(), key=lambda x:(-x[1], x[0]))
+    frequency_per_channel = sort_videos_by_channel(videos_per_channel(data))
 
     with open(f"statistics_{current_time}.md", "w", encoding="utf-8") as file:
         file.write("# Watch history statistics\n")
