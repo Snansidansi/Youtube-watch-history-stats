@@ -1,5 +1,7 @@
 import json
 import datetime
+import os
+
 from matplotlib import pyplot as plt
 from matplotlib import rcParams
 
@@ -51,12 +53,13 @@ def get_newest(data):
     return date.strftime("%Y-%m-%d %H:%M:%S")
 
 
-def save_stats(data, threshold):
+def save_stats(data, threshold, output_dir):
     current_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     frequency_per_channel = sort_videos_by_channel(videos_per_channel(data))
-    diagram_name = f"frequency-per-channel_{current_time}"
+    statistics_path = os.path.join(output_dir, f"statistics_{current_time}.md")
+    diagram_path = os.path.join(output_dir, f"frequency-per-channel_{current_time}.png")
 
-    with open(f"statistics_{current_time}.md", "w", encoding="utf-8") as file:
+    with open(statistics_path, "w", encoding="utf-8") as file:
         file.write("# Watch history statistics\n")
         file.write(f"Total videos: {total_videos(data)}\n\n")
         file.write(f"Total channels: {len(frequency_per_channel)}\n\n")
@@ -68,12 +71,12 @@ def save_stats(data, threshold):
             percentage = (channel[1] / total_videos(data))
             file.write(f"{count}. {channel[0]}: {channel[1]} ({percentage:.2%})\n")
 
-        file.write(f"\n![]({diagram_name}.png)")
+        file.write(f"\n![]({diagram_path}.png)")
 
-    create_diagram(dict(frequency_per_channel), threshold, diagram_name, data)
+    create_diagram(dict(frequency_per_channel), threshold, diagram_path, data)
 
 
-def create_diagram(frequency, threshold, name, data):
+def create_diagram(frequency, threshold, diagram_path, data):
     counter = dict(threshold_videos_by_channel(frequency, threshold))
     x = list(counter.keys())
     y = list(counter.values())
@@ -94,9 +97,10 @@ def create_diagram(frequency, threshold, name, data):
     plt.bar(x, y, width=0.75)
     plt.tight_layout()
 
-    plt.savefig(name)
+    plt.savefig(diagram_path)
 
 
 def total_stats(filename, threshold):
     data = get_data_from_file(filename)
-    save_stats(data, threshold)
+    output_dir = os.path.dirname(os.path.abspath(filename))
+    save_stats(data, threshold, output_dir)
