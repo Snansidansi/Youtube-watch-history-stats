@@ -73,7 +73,8 @@ def save_stats(data, threshold, output_dir):
     current_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     frequency_per_channel = sort_videos_by_channel(videos_per_channel(data))
     statistics_path = os.path.join(output_dir, f"statistics_{current_time}.md")
-    diagram_path = os.path.join(output_dir, f"frequency-per-channel_{current_time}")
+    diagram_name = f"frequency-per-channel_{current_time}"
+    diagram_path = os.path.join(output_dir, diagram_name)
     deleted_videos = get_deleted(data)
 
     with open(statistics_path, "w", encoding="utf-8") as file:
@@ -89,7 +90,7 @@ def save_stats(data, threshold, output_dir):
             percentage = (channel[1] / total_videos(data))
             file.write(f"{count}. {channel[0]}: {channel[1]} ({percentage:.4%})\n")
 
-        file.write(f"\n![]({diagram_path}.png)")
+        file.write(f"\n![]({diagram_name}.png)")
 
     create_diagram(dict(frequency_per_channel), threshold, diagram_path, data, deleted_videos)
 
