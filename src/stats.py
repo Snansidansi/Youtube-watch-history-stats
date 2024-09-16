@@ -1,9 +1,11 @@
 import json
 import datetime
 import os
+import warnings
 
 from matplotlib import pyplot as plt
 from matplotlib import rcParams
+from matplotlib.ticker import MaxNLocator
 
 
 def get_data_from_file(filename):
@@ -71,7 +73,7 @@ def save_stats(data, threshold, output_dir):
     current_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     frequency_per_channel = sort_videos_by_channel(videos_per_channel(data))
     statistics_path = os.path.join(output_dir, f"statistics_{current_time}.md")
-    diagram_path = os.path.join(output_dir, f"frequency-per-channel_{current_time}.png")
+    diagram_path = os.path.join(output_dir, f"frequency-per-channel_{current_time}")
     deleted_videos = get_deleted(data)
 
     with open(statistics_path, "w", encoding="utf-8") as file:
@@ -85,7 +87,7 @@ def save_stats(data, threshold, output_dir):
         file.write("## Videos per channel (without deleted videos)\n")
         for count, channel in enumerate(frequency_per_channel, 1):
             percentage = (channel[1] / total_videos(data))
-            file.write(f"{count}. {channel[0]}: {channel[1]} ({percentage:.2%})\n")
+            file.write(f"{count}. {channel[0]}: {channel[1]} ({percentage:.4%})\n")
 
         file.write(f"\n![]({diagram_path}.png)")
 
@@ -98,10 +100,11 @@ def create_diagram(frequency, threshold, diagram_path, data, deleted_videos):
     y = list(counter.values())
     label_length = max([len(channel) for channel in counter])
 
+    warnings.filterwarnings("ignore")
     rcParams['font.family'] = 'Malgun Gothic'
 
     fig_size = plt.gcf().get_size_inches()
-    plt.figure(figsize=(fig_size[0], fig_size[1] + label_length * 0.05))
+    plt.figure(figsize=(fig_size[0] + len(x) * 0.12, fig_size[1] + label_length * 0.05))
     plt.style.use("fast")
 
     plt.title(f"Videos per channel (threshold: {threshold} --- {sum(y)}/{total_videos(data) - deleted_videos})")
@@ -109,11 +112,11 @@ def create_diagram(frequency, threshold, diagram_path, data, deleted_videos):
     plt.ylabel("Videos")
 
     plt.xticks(rotation=90)
-    plt.yticks(y)
-    plt.bar(x, y, width=0.75)
+    plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
+    plt.bar(x, y, width=0.65)
     plt.tight_layout()
 
-    plt.savefig(diagram_path)
+    plt.savefig(diagram_path, bbox_inches='tight', dpi=200)
 
 
 def total_stats(filename, threshold):
