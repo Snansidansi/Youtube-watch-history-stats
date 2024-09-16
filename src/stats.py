@@ -1,6 +1,7 @@
 import json
 import datetime
 from matplotlib import pyplot as plt
+from matplotlib import rcParams
 
 
 def get_data_from_file(filename):
@@ -78,6 +79,8 @@ def create_diagram(frequency, threshold, name, data):
     y = list(counter.values())
     label_length = max([len(channel) for channel in counter])
 
+    rcParams['font.family'] = ' Malgun Gothic'
+
     fig_size = plt.gcf().get_size_inches()
     plt.figure(figsize=(fig_size[0], fig_size[1] + label_length * 0.05))
     plt.style.use("fast")
@@ -94,6 +97,6 @@ def create_diagram(frequency, threshold, name, data):
     plt.savefig(name)
 
 
-def total_stats(filename):
+def total_stats(filename, threshold):
     data = get_data_from_file(filename)
-    save_stats(data, 0)
+    save_stats(data, threshold)
