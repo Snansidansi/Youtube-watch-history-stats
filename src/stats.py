@@ -79,7 +79,7 @@ def create_diagram(frequency, threshold, name, data):
     y = list(counter.values())
     label_length = max([len(channel) for channel in counter])
 
-    rcParams['font.family'] = ' Malgun Gothic'
+    rcParams['font.family'] = 'Malgun Gothic'
 
     fig_size = plt.gcf().get_size_inches()
     plt.figure(figsize=(fig_size[0], fig_size[1] + label_length * 0.05))
